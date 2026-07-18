@@ -1,0 +1,58 @@
+import SwiftUI
+
+/// A hand-drawn replica of the stock lowercase QWERTY keyboard. We can't read
+/// raw touch coordinates off Apple's actual system keyboard from a normal
+/// app, so this view stands in for it — close enough in proportions to be a
+/// meaningful stand-in for where fingers land.
+struct KeyboardView: View {
+    let target: Character
+    let onTap: (_ tappedChar: Character, _ tapPoint: CGPoint, _ targetKeyCenter: CGPoint) -> Void
+
+    var body: some View {
+        GeometryReader { geo in
+            let frames = KeyboardLayout.frames(in: geo.size)
+
+            ZStack(alignment: .topLeading) {
+                ForEach(Array(frames.keys), id: \.self) { char in
+                    if let frame = frames[char] {
+                        KeyCap(char: char, isTarget: char == target)
+                            .frame(width: frame.width - 4, height: frame.height - 4)
+                            .position(x: frame.midX, y: frame.midY)
+                    }
+                }
+            }
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onEnded { value in
+                        let point = value.location
+                        let tapped = KeyboardLayout.nearestKey(to: point, in: frames)
+                        let targetCenter = frames[target]?.center ?? point
+                        onTap(tapped, point, targetCenter)
+                    }
+            )
+        }
+        .frame(height: 220)
+        .background(Color(.systemGray5))
+    }
+}
+
+private struct KeyCap: View {
+    let char: Character
+    let isTarget: Bool
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 6)
+            .fill(isTarget ? Color.accentColor : Color(.systemBackground))
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(isTarget ? Color.accentColor : Color(.systemGray3), lineWidth: isTarget ? 2 : 1)
+            )
+            .overlay(
+                Text(char == " " ? "space" : String(char))
+                    .font(.system(size: char == " " ? 14 : 20, weight: .medium))
+                    .foregroundColor(isTarget ? .white : .primary)
+            )
+            .shadow(color: .black.opacity(0.15), radius: 1, y: 1)
+    }
+}

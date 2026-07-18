@@ -1,0 +1,23 @@
+name: AdaptiveKeyboard
+options:
+  bundleIdPrefix: com.jefflewis.adaptivekeyboard
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  TapTest:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/TapTest
+    info:
+      path: Generated/TapTest-Info.plist
+      properties:
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jefflewis.adaptivekeyboard.taptest
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
