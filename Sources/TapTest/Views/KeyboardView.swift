@@ -15,9 +15,15 @@ struct KeyboardView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let frames = style == .split
-                ? SplitKeyboardLayout.frames(in: geo.size)
-                : KeyboardLayout.frames(in: geo.size)
+            let frames: [Character: CGRect]
+            switch style {
+            case .split:
+                frames = SplitKeyboardLayout.frames(in: geo.size)
+            case .gridEnlargedLeft:
+                frames = KeyboardLayout.frames(in: geo.size, enlargeLeftThird: true)
+            case .gridClassic:
+                frames = KeyboardLayout.frames(in: geo.size, enlargeLeftThird: false)
+            }
 
             ZStack(alignment: .topLeading) {
                 ForEach(Array(frames.keys), id: \.self) { char in
@@ -59,7 +65,8 @@ struct KeyboardView: View {
 }
 
 enum KeyboardStyle {
-    case grid
+    case gridClassic
+    case gridEnlargedLeft
     case split
 }
 

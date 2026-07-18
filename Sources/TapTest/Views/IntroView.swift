@@ -44,8 +44,10 @@ struct IntroView: View {
 
     private var descriptionText: String {
         switch session.mode {
+        case .classic:
+            return "The original keyboard: every key the same size, no resizing. Same random sentences as Full Keyboard, so the two are directly comparable — this is the 'before' side of the comparison."
         case .full:
-            return "You'll type out a few sentences on the keyboard below. Just tap normally, at your natural pace — don't try to be careful. Every tap gets recorded, right or wrong, and we move on to the next letter regardless."
+            return "The current keyboard: left-third keys enlarged, right two-thirds slightly shrunk to compensate. Just tap normally, at your natural pace — don't try to be careful. Every tap gets recorded, right or wrong, and we move on to the next letter regardless."
         case .sidesOnly:
             return "This drill only asks for letters near the left/right edges of the keyboard — no middle-cluster letters, no space bar. Just tap normally at your natural pace; it's random letters, not real words, so don't try to read meaning into it."
         case .split:

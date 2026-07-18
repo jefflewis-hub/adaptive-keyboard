@@ -8,21 +8,26 @@ enum TestStage {
 }
 
 enum TestMode: String, CaseIterable, Identifiable {
-    case full = "Full Keyboard"
-    case sidesOnly = "Sides Only"
-    case split = "Split Layout"
+    case classic = "Classic"
+    case full = "Full"
+    case sidesOnly = "Sides"
+    case split = "Split"
 
     var id: String { rawValue }
 
     func makeSentences() -> [String] {
         switch self {
-        case .full, .split: return Prompts.randomSet()
+        case .classic, .full, .split: return Prompts.randomSet()
         case .sidesOnly: return Prompts.sideDrill()
         }
     }
 
     var keyboardStyle: KeyboardStyle {
-        self == .split ? .split : .grid
+        switch self {
+        case .classic: return .gridClassic
+        case .full, .sidesOnly: return .gridEnlargedLeft
+        case .split: return .split
+        }
     }
 }
 

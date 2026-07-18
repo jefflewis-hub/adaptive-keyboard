@@ -42,15 +42,18 @@ enum KeyboardLayout {
 
     /// Computes each key's frame (including the space bar as " ") for a given
     /// keyboard canvas size, mirroring the real keyboard's row staggering.
-    static func frames(in size: CGSize) -> [Character: CGRect] {
+    /// `enlargeLeftThird` toggles the resized-target experiment on or off,
+    /// so it can be A/B tested directly against the classic uniform grid
+    /// while keeping the space bar position identical in both.
+    static func frames(in size: CGSize, enlargeLeftThird: Bool = true) -> [Character: CGRect] {
         let unit = size.width / CGFloat(baseRowKeyCount)
         let rowHeight = size.height / CGFloat(rowCount)
 
         var result: [Character: CGRect] = [:]
         for (rowIndex, row) in rows.enumerated() {
-            let leftCount = row.filter { leftThirdKeys.contains($0) }.count
+            let leftCount = enlargeLeftThird ? row.filter { leftThirdKeys.contains($0) }.count : 0
             let rightCount = row.count - leftCount
-            let shrinkFactor: CGFloat = rightCount > 0
+            let shrinkFactor: CGFloat = (enlargeLeftThird && rightCount > 0)
                 ? (CGFloat(row.count) - CGFloat(leftCount) * leftThirdEnlargeFactor) / CGFloat(rightCount)
                 : 1
             let rowWidth = CGFloat(leftCount) * unit * leftThirdEnlargeFactor
@@ -60,7 +63,8 @@ enum KeyboardLayout {
 
             var x = inset
             for char in row {
-                let width = unit * (leftThirdKeys.contains(char) ? leftThirdEnlargeFactor : shrinkFactor)
+                let isEnlarged = enlargeLeftThird && leftThirdKeys.contains(char)
+                let width = unit * (isEnlarged ? leftThirdEnlargeFactor : shrinkFactor)
                 result[char] = CGRect(x: x, y: y, width: width, height: rowHeight)
                 x += width
             }
