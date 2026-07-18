@@ -25,6 +25,21 @@ enum KeyboardLayout {
         return result
     }()
 
+    /// The left third of each row - one-handed (right-thumb) testing showed
+    /// this is the weak zone (58% hit rate vs 88% on the right two-thirds).
+    /// Roughly half those misses were near-misses a bigger target would
+    /// catch, so these keys get wider hit targets; the right two-thirds
+    /// shrink just enough to keep each row's total width unchanged.
+    static let leftThirdKeys: Set<Character> = {
+        var result: Set<Character> = []
+        for row in rows {
+            result.formUnion(row.prefix(max(1, row.count / 3)))
+        }
+        return result
+    }()
+
+    static let leftThirdEnlargeFactor: CGFloat = 1.4
+
     /// Computes each key's frame (including the space bar as " ") for a given
     /// keyboard canvas size, mirroring the real keyboard's row staggering.
     static func frames(in size: CGSize) -> [Character: CGRect] {
@@ -33,12 +48,21 @@ enum KeyboardLayout {
 
         var result: [Character: CGRect] = [:]
         for (rowIndex, row) in rows.enumerated() {
-            let rowWidth = CGFloat(row.count) * unit
+            let leftCount = row.filter { leftThirdKeys.contains($0) }.count
+            let rightCount = row.count - leftCount
+            let shrinkFactor: CGFloat = rightCount > 0
+                ? (CGFloat(row.count) - CGFloat(leftCount) * leftThirdEnlargeFactor) / CGFloat(rightCount)
+                : 1
+            let rowWidth = CGFloat(leftCount) * unit * leftThirdEnlargeFactor
+                + CGFloat(rightCount) * unit * shrinkFactor
             let inset = (size.width - rowWidth) / 2
             let y = CGFloat(rowIndex) * rowHeight
-            for (i, char) in row.enumerated() {
-                let x = inset + CGFloat(i) * unit
-                result[char] = CGRect(x: x, y: y, width: unit, height: rowHeight)
+
+            var x = inset
+            for char in row {
+                let width = unit * (leftThirdKeys.contains(char) ? leftThirdEnlargeFactor : shrinkFactor)
+                result[char] = CGRect(x: x, y: y, width: width, height: rowHeight)
+                x += width
             }
         }
 
