@@ -12,8 +12,7 @@ final class TestSession: ObservableObject {
     @Published var sentenceIndex = 0
     @Published var charIndex = 0
     @Published var records: [TapRecord] = []
-
-    let sentences: [String] = Prompts.sentences
+    @Published private(set) var sentences: [String] = Prompts.randomSet()
 
     var currentSentenceChars: [Character] {
         Array(sentences[sentenceIndex])
@@ -65,6 +64,7 @@ final class TestSession: ObservableObject {
         sentenceIndex = 0
         charIndex = 0
         records = []
+        sentences = Prompts.randomSet()
         stage = .intro
     }
 }
