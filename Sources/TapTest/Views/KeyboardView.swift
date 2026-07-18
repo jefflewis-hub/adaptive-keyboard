@@ -15,15 +15,7 @@ struct KeyboardView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let frames: [Character: CGRect]
-            switch style {
-            case .split:
-                frames = SplitKeyboardLayout.frames(in: geo.size)
-            case .gridEnlargedLeft:
-                frames = KeyboardLayout.frames(in: geo.size, enlargeLeftThird: true)
-            case .gridClassic:
-                frames = KeyboardLayout.frames(in: geo.size, enlargeLeftThird: false)
-            }
+            let frames = Self.frames(for: style, in: geo.size)
 
             ZStack(alignment: .topLeading) {
                 ForEach(Array(frames.keys), id: \.self) { char in
@@ -61,6 +53,17 @@ struct KeyboardView: View {
         guard let lastTapTime, let lastTapPoint else { return false }
         let sameSpot = abs(point.x - lastTapPoint.x) < 2 && abs(point.y - lastTapPoint.y) < 2
         return sameSpot && Date().timeIntervalSince(lastTapTime) < 0.15
+    }
+
+    private static func frames(for style: KeyboardStyle, in size: CGSize) -> [Character: CGRect] {
+        switch style {
+        case .split:
+            return SplitKeyboardLayout.frames(in: size)
+        case .gridEnlargedLeft:
+            return KeyboardLayout.frames(in: size, enlargeLeftThird: true)
+        case .gridClassic:
+            return KeyboardLayout.frames(in: size, enlargeLeftThird: false)
+        }
     }
 }
 
