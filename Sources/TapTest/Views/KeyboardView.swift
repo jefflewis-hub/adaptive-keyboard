@@ -9,9 +9,8 @@ struct KeyboardView: View {
     let style: KeyboardStyle
     let onTap: (_ tappedChar: Character, _ tapPoint: CGPoint, _ targetKeyCenter: CGPoint) -> Void
 
-    // Guards against a single physical tap being recognized twice in a row
-    // (observed during fast typing bursts with a zero-distance DragGesture,
-    // which gets recreated on every render and can double-fire).
+    // Defense-in-depth against a single physical tap being recorded twice at
+    // nearly the same point in quick succession.
     @State private var lastTapTime: Date?
     @State private var lastTapPoint: CGPoint?
 
@@ -29,21 +28,18 @@ struct KeyboardView: View {
                             .position(x: frame.midX, y: frame.midY)
                     }
                 }
-            }
-            .contentShape(Rectangle())
-            .gesture(
-                SpatialTapGesture()
-                    .onEnded { value in
-                        let point = value.location
-                        if isDuplicate(of: point) { return }
-                        lastTapTime = Date()
-                        lastTapPoint = point
 
-                        let tapped = KeyboardLayout.nearestKey(to: point, in: frames)
-                        let targetCenter = frames[target]?.center ?? point
-                        onTap(tapped, point, targetCenter)
-                    }
-            )
+                TouchCaptureView { point in
+                    if isDuplicate(of: point) { return }
+                    lastTapTime = Date()
+                    lastTapPoint = point
+
+                    let tapped = KeyboardLayout.nearestKey(to: point, in: frames)
+                    let targetCenter = frames[target]?.center ?? point
+                    onTap(tapped, point, targetCenter)
+                }
+                .frame(width: geo.size.width, height: geo.size.height)
+            }
         }
         .frame(height: style == .split ? 320 : 220)
         .background(Color(.systemGray5))
