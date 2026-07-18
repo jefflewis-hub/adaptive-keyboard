@@ -7,12 +7,27 @@ enum TestStage {
     case results
 }
 
+enum TestMode: String, CaseIterable, Identifiable {
+    case full = "Full Keyboard"
+    case sidesOnly = "Sides Only"
+
+    var id: String { rawValue }
+
+    func makeSentences() -> [String] {
+        switch self {
+        case .full: return Prompts.randomSet()
+        case .sidesOnly: return Prompts.sideDrill()
+        }
+    }
+}
+
 final class TestSession: ObservableObject {
     @Published var stage: TestStage = .intro
+    @Published var mode: TestMode = .full
     @Published var sentenceIndex = 0
     @Published var charIndex = 0
     @Published var records: [TapRecord] = []
-    @Published private(set) var sentences: [String] = Prompts.randomSet()
+    @Published private(set) var sentences: [String] = TestMode.full.makeSentences()
 
     var currentSentenceChars: [Character] {
         Array(sentences[sentenceIndex])
@@ -35,6 +50,7 @@ final class TestSession: ObservableObject {
     }
 
     func start() {
+        sentences = mode.makeSentences()
         stage = .testing
     }
 
@@ -64,7 +80,6 @@ final class TestSession: ObservableObject {
         sentenceIndex = 0
         charIndex = 0
         records = []
-        sentences = Prompts.randomSet()
         stage = .intro
     }
 }

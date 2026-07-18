@@ -13,6 +13,18 @@ enum KeyboardLayout {
     static let rowCount = rows.count + 1 // + space bar row
     static let baseRowKeyCount = 10 // row 1 defines the key unit width
 
+    /// Keys near the left/right edges of each row - closest to a thumb's
+    /// natural pivot point, farthest from the awkward middle reach.
+    static let sideKeys: Set<Character> = {
+        var result: Set<Character> = []
+        for row in rows {
+            let edgeCount = max(1, row.count / 3)
+            result.formUnion(row.prefix(edgeCount))
+            result.formUnion(row.suffix(edgeCount))
+        }
+        return result
+    }()
+
     /// Computes each key's frame (including the space bar as " ") for a given
     /// keyboard canvas size, mirroring the real keyboard's row staggering.
     static func frames(in size: CGSize) -> [Character: CGRect] {

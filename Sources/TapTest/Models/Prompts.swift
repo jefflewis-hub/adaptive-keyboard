@@ -27,4 +27,14 @@ enum Prompts {
     static func randomSet(count: Int = 7) -> [String] {
         Array(pool.shuffled().prefix(count))
     }
+
+    /// Random letters drawn only from KeyboardLayout.sideKeys (no space bar,
+    /// no middle-cluster letters) - isolates side-key accuracy from the rest
+    /// of the keyboard so it can be compared against the full-keyboard runs.
+    static func sideDrill(chunkCount: Int = 8, chunkLength: Int = 8) -> [String] {
+        let keys = Array(KeyboardLayout.sideKeys)
+        return (0..<chunkCount).map { _ in
+            String((0..<chunkLength).compactMap { _ in keys.randomElement() })
+        }
+    }
 }
