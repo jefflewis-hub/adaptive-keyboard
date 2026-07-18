@@ -21,7 +21,7 @@ struct KeyboardView: View {
             ZStack(alignment: .topLeading) {
                 ForEach(Array(frames.keys), id: \.self) { char in
                     if let frame = frames[char] {
-                        KeyCap(char: char, isTarget: char == target)
+                        KeyCap(char: char)
                             .frame(width: frame.width - 4, height: frame.height - 4)
                             .position(x: frame.midX, y: frame.midY)
                     }
@@ -55,19 +55,18 @@ struct KeyboardView: View {
 
 private struct KeyCap: View {
     let char: Character
-    let isTarget: Bool
 
     var body: some View {
         RoundedRectangle(cornerRadius: 6)
-            .fill(isTarget ? Color.accentColor : Color(.systemBackground))
+            .fill(Color(.systemBackground))
             .overlay(
                 RoundedRectangle(cornerRadius: 6)
-                    .stroke(isTarget ? Color.accentColor : Color(.systemGray3), lineWidth: isTarget ? 2 : 1)
+                    .stroke(Color(.systemGray3), lineWidth: 1)
             )
             .overlay(
                 Text(char == " " ? "space" : String(char))
                     .font(.system(size: char == " " ? 14 : 20, weight: .medium))
-                    .foregroundColor(isTarget ? .white : .primary)
+                    .foregroundColor(.primary)
             )
             .shadow(color: .black.opacity(0.15), radius: 1, y: 1)
     }
