@@ -42,18 +42,19 @@ enum KeyboardLayout {
             }
         }
 
-        // Pooled data across every full-keyboard run so far shows a taps
-        // land ~11-12% of the keyboard's width to the right of the space
-        // bar's naive geometric center - not a miss (hit rate there is
-        // already high), but a real, consistent gap between where the key
-        // visually sits and where the aim actually lands. Recentering the
-        // key on the real aim point, rather than the middle of the screen,
-        // is the whole premise of this project.
-        let spaceY = CGFloat(rows.count) * rowHeight
+        // Pooled data across every full-keyboard run shows taps landing
+        // right and slightly below the space bar's naive geometric center -
+        // not a miss (hit rate there is already high), but a real, consistent
+        // gap between where the key visually sits and where the aim actually
+        // lands. Recentering the key on the real aim point, rather than the
+        // middle of the screen, is the whole premise of this project. First
+        // pass under-shot (clamped short of the real target); this pass
+        // measured the residual after that first shift and folds it in.
         let spaceWidth = size.width - 2 * unit
-        let rightShift = size.width * 0.116
-        let maxX = size.width - unit * 0.5 - spaceWidth
+        let rightShift = size.width * 0.109
+        let maxX = size.width - spaceWidth
         let spaceX = min(unit + rightShift, max(unit, maxX))
+        let spaceY = CGFloat(rows.count) * rowHeight + rowHeight * 0.109
         result[" "] = CGRect(x: spaceX, y: spaceY, width: spaceWidth, height: rowHeight)
 
         return result
