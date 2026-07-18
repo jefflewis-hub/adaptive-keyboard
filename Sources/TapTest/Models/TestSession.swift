@@ -10,14 +10,19 @@ enum TestStage {
 enum TestMode: String, CaseIterable, Identifiable {
     case full = "Full Keyboard"
     case sidesOnly = "Sides Only"
+    case split = "Split Layout"
 
     var id: String { rawValue }
 
     func makeSentences() -> [String] {
         switch self {
-        case .full: return Prompts.randomSet()
+        case .full, .split: return Prompts.randomSet()
         case .sidesOnly: return Prompts.sideDrill()
         }
+    }
+
+    var keyboardStyle: KeyboardStyle {
+        self == .split ? .split : .grid
     }
 }
 

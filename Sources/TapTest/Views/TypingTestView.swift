@@ -21,7 +21,7 @@ struct TypingTestView: View {
 
             Spacer()
 
-            KeyboardView(target: session.currentTargetChar) { tapped, point, targetCenter in
+            KeyboardView(target: session.currentTargetChar, style: session.mode.keyboardStyle) { tapped, point, targetCenter in
                 session.recordTap(tappedChar: tapped, tapPoint: point, targetKeyCenter: targetCenter)
             }
         }

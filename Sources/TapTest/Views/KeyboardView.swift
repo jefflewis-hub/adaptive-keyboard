@@ -6,6 +6,7 @@ import SwiftUI
 /// meaningful stand-in for where fingers land.
 struct KeyboardView: View {
     let target: Character
+    let style: KeyboardStyle
     let onTap: (_ tappedChar: Character, _ tapPoint: CGPoint, _ targetKeyCenter: CGPoint) -> Void
 
     // Guards against a single physical tap being recognized twice in a row
@@ -16,7 +17,9 @@ struct KeyboardView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let frames = KeyboardLayout.frames(in: geo.size)
+            let frames = style == .split
+                ? SplitKeyboardLayout.frames(in: geo.size)
+                : KeyboardLayout.frames(in: geo.size)
 
             ZStack(alignment: .topLeading) {
                 ForEach(Array(frames.keys), id: \.self) { char in
@@ -42,7 +45,7 @@ struct KeyboardView: View {
                     }
             )
         }
-        .frame(height: 220)
+        .frame(height: style == .split ? 320 : 220)
         .background(Color(.systemGray5))
     }
 
@@ -51,6 +54,11 @@ struct KeyboardView: View {
         let sameSpot = abs(point.x - lastTapPoint.x) < 2 && abs(point.y - lastTapPoint.y) < 2
         return sameSpot && Date().timeIntervalSince(lastTapTime) < 0.15
     }
+}
+
+enum KeyboardStyle {
+    case grid
+    case split
 }
 
 private struct KeyCap: View {
