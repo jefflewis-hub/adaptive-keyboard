@@ -28,25 +28,26 @@ struct TypingTestView: View {
 
     private var sentenceText: some View {
         let chars = session.currentSentenceChars
-        return chars.indices.reduce(Text("")) { partial, i in
-            let char = chars[i]
-            let display = char == " " ? " " : String(char)
-            var segment = Text(display)
+        var attributed = AttributedString(String(chars))
+        attributed.font = .system(.title2, design: .monospaced)
+        for i in chars.indices {
+            guard let start = attributed.characters.index(attributed.startIndex, offsetBy: i, limitedBy: attributed.endIndex),
+                  let end = attributed.characters.index(start, offsetBy: 1, limitedBy: attributed.endIndex) else { continue }
+            let range = start..<end
             if i < session.charIndex {
-                segment = segment.foregroundColor(.secondary)
+                attributed[range].foregroundColor = .secondary
             } else if i == session.charIndex {
-                segment = segment.foregroundColor(.accentColor).bold()
-                    .font(.system(.title2, design: .monospaced))
+                attributed[range].foregroundColor = .accentColor
+                attributed[range].font = .system(.title2, design: .monospaced).bold()
             } else {
-                segment = segment.foregroundColor(.primary.opacity(0.35))
+                attributed[range].foregroundColor = .primary.opacity(0.35)
             }
-            return partial + segment
         }
-        .font(.system(.title2, design: .monospaced))
-        .lineSpacing(6)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(12)
+        return Text(attributed)
+            .lineSpacing(6)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(12)
     }
 }
